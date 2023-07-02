@@ -1,0 +1,67 @@
+import React, { useState, useEffect, createContext } from "react";
+
+const NoteContext = createContext();
+
+// get Local Items
+const getLocalItems = () => {
+  let list = localStorage.getItem("lists");
+  // console.log(list);
+  if (list) return JSON.parse(localStorage.getItem("lists"));
+  else return [];
+};
+
+function Note() {
+  const [formData, setFormData] = useState({
+    title: "",
+    content: "",
+  });
+
+  const [allIdeas, setAllIdeas] = useState(getLocalItems());
+
+  const handleInput = (event) => {
+    const name = event.target.name;
+    const value = event.target.value;
+    // console.log(name, value);
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    // console.log(allIdeas);
+    const newIdea = { ...formData, id: new Date().getTime().toString() };
+    setAllIdeas([...allIdeas, newIdea]);
+  };
+
+  //add data to local storage
+  useEffect(() => {
+    localStorage.setItem("lists", JSON.stringify(allIdeas));
+  }, [allIdeas]);
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        <div className="center">
+          <div className="keeper-box">
+            <input
+              name="title"
+              className="title"
+              placeholder="Title"
+              autoComplete="off"
+              onChange={handleInput}
+              value={formData.title}
+            ></input>
+            <textarea
+              name="content"
+              className="content"
+              autoComplete="off"
+              onChange={handleInput}
+              value={formData.content}
+            ></textarea>
+            <button className="submit">Submit</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  );
+}
+export default Note;
+export { getLocalItems };
